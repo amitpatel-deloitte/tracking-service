@@ -12,9 +12,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @Hidden
 public class OrderDTO {
-    private int id;
+    private int order_id;
     private int restaurant_id;
     private int user_id;
     private OrderStatus orderStatus;
-    private PaymentStatus paymentStatus;
 }

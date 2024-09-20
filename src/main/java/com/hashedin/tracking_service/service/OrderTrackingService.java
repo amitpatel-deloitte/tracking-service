@@ -1,8 +1,12 @@
 package com.hashedin.tracking_service.service;
 
 import com.hashedin.tracking_service.client.OrderClient;
+import com.hashedin.tracking_service.exceptionHandler.NotFoundException;
+import com.hashedin.tracking_service.exceptionHandler.OrderNotPlaced;
 import com.hashedin.tracking_service.model.OrderDTO;
+import com.hashedin.tracking_service.model.OrderStatus;
 import com.hashedin.tracking_service.model.OrderTracking;
+import com.hashedin.tracking_service.model.TrackingStatus;
 import com.hashedin.tracking_service.repository.OrderTrackingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,27 +22,31 @@ public class OrderTrackingService {
     @Autowired
     private OrderClient orderClient;
 
-    public OrderTracking startTracking(int orderId){
+    public OrderTracking startTracking(Long orderId){
         OrderDTO order = orderClient.getOrderById(orderId);
 
+        if(order.getOrderStatus() == OrderStatus.PENDING){
+            throw new OrderNotPlaced((" Order status is still pending. Tracking not available"));
+        }
+
         OrderTracking tracking = new OrderTracking();
-        tracking.setOrderId(order.getId());
-        tracking.setCurrentStatus("ORDER Placed");
+        tracking.setOrderId(order.getOrder_id());
+        tracking.setCurrentStatus(order.getOrderStatus().name());
         tracking.setStatusUpdateTime(LocalDateTime.now());
         return trackingRepository.save(tracking);
     }
 
-    public OrderTracking updateTracking(int orderId, String newStatus){
-        OrderTracking tracking = trackingRepository.findOrderById(orderId)
-                .orElseThrow(() -> new RuntimeException(" Tracking not found for the order " + orderId));
-        tracking.setCurrentStatus(newStatus);
+    public OrderTracking updateTracking(Long trackingId, TrackingStatus newStatus){
+        OrderTracking tracking = trackingRepository.findTrackingById(trackingId)
+                .orElseThrow(() -> new NotFoundException(" Tracking not found for the tracking id " + trackingId));
+        tracking.setCurrentStatus(newStatus.name());
         tracking.setStatusUpdateTime(LocalDateTime.now());
         return trackingRepository.save(tracking);
     }
 
-    public OrderTracking getTrackingByOrderId(int orderId){
-        return trackingRepository.findOrderById(orderId)
-                .orElseThrow(() -> new RuntimeException(" Tracking not found for the order " + orderId));
+    public OrderTracking getTrackingByOrderId(Long trackingId){
+        return trackingRepository.findTrackingById(trackingId)
+                .orElseThrow(() -> new NotFoundException(" Tracking not found for the tracking id  " + trackingId));
     }
 
 

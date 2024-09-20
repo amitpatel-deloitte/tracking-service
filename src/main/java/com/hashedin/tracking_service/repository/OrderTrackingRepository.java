@@ -9,5 +9,6 @@ import java.util.Optional;
 @Repository
 public interface OrderTrackingRepository extends JpaRepository<OrderTracking, Long> {
 
-    Optional<OrderTracking> findOrderById( int orderId);
+    Optional<OrderTracking> findTrackingById( Long orderId);
 }
+
