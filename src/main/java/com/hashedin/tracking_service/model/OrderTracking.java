@@ -1,12 +1,12 @@
 package com.hashedin.tracking_service.model;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "Tracking")
 @Getter
 @Setter
 @Builder
@@ -16,7 +16,7 @@ public class OrderTracking {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int trackingId;
+    private int id;
 
     private int orderId;
     private String currentStatus;
